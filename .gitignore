@@ -1,0 +1,35 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# 环境变量与敏感信息
+.env
+.env.*
+!.env.example
+
+# SQLite 数据文件（由 backend/seed.js + seedPrice.js 重建）
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3

@@ -1,0 +1,227 @@
+/**
+ * 作物 → 背景图映射（地区推荐卡 + 价格总览卡共用）
+ *
+ * 2026-10-15 全量去重改版：价格总览 30 品种 + 地区推荐 165 种作物
+ * 逐一生成专属图（150 张新图，public/images/crop-*.jpg），不再有共用图。
+ *   - 精确 map 覆盖全部已知 cropType（价格 30 品种 + 推荐 165 种 + 少量别名）；
+ *   - 茶叶按需求保留共用茶园图 crop-tea.jpg（唯一例外，用户明确要求）；
+ *   - 规则区仅作「未知新作物」的安全网，正常命中的作物都走精确 map。
+ *
+ * 新图命名规则：public/images/crop-<slug>.jpg，
+ * 补图/改图后在此同步新增精确映射（slug 与作物中文名一一对应）。
+ */
+
+/**
+ * 兜底图：未知作物时使用。
+ * 2026-10-17 修正：原为 hero-fields.jpg，该图随横幅改版已删除，
+ * 导致未知作物命中 404、推荐卡与价格卡出现破图。
+ * 兜底图必须是**永远存在**的中性图，不随视觉改版下线。
+ */
+const FALLBACK_IMAGE = '/images/crop-fallback.jpg';
+
+/** 精确匹配：作物名 → 专属图（价格 30 品种 + 推荐 165 种全覆盖） */
+const CROP_IMAGE_MAP: Record<string, string> = {
+  '猕猴桃': '/images/crop-kiwi.jpg',
+  '芒果': '/images/crop-mango.jpg',
+  '草莓': '/images/crop-strawberry.jpg',
+  '西瓜': '/images/crop-watermelon.jpg',
+  '马铃薯': '/images/crop-potato.jpg',
+  '豆角': '/images/crop-yardlong-bean.jpg',
+  '大白菜': '/images/crop-chinese-cabbage.jpg',
+  '芹菜': '/images/crop-celery.jpg',
+  '黄瓜': '/images/crop-cucumber.jpg',
+  '茄子': '/images/crop-eggplant.jpg',
+  '大蒜': '/images/crop-garlic.jpg',
+  '生姜': '/images/crop-ginger.jpg',
+  '香菇': '/images/crop-shiitake.jpg',
+  '辣椒': '/images/crop-chili-pepper.jpg',
+  '白萝卜': '/images/crop-white-radish.jpg',
+  '菠菜': '/images/crop-spinach.jpg',
+  '西红柿': '/images/crop-tomato.jpg',
+  '万昌大米': '/images/crop-wanchang-rice.jpg',
+  '三亚芒果': '/images/crop-sanya-mango.jpg',
+  '东宁黑木耳': '/images/crop-dongning-wood-ear.jpg',
+  '东山白沙枇杷': '/images/crop-dongshan-loquat.jpg',
+  '东港草莓': '/images/crop-donggang-strawberry.jpg',
+  '中卫硒砂瓜': '/images/crop-zhongwei-melon.jpg',
+  '临安山核桃': '/images/crop-linan-walnut.jpg',
+  '临潼石榴': '/images/crop-lintong-pomegranate.jpg',
+  '临猗苹果': '/images/crop-linyi-apple.jpg',
+  '乌兰察布马铃薯': '/images/crop-wulanchabu-potato.jpg',
+  '乐陵小枣': '/images/crop-leling-jujube.jpg',
+  '五常大米': '/images/crop-wuchang-rice.jpg',
+  '交城骏枣': '/images/crop-jiaocheng-jujube.jpg',
+  '亳州白芍': '/images/crop-bozhou-peony.jpg',
+  '仙居杨梅': '/images/crop-xianju-bayberry.jpg',
+  '伊春蓝莓': '/images/crop-yichun-blueberry.jpg',
+  '会宁小杂粮': '/images/crop-huining-grain.jpg',
+  '会理石榴': '/images/crop-huili-pomegranate.jpg',
+  '佳木斯大米': '/images/crop-jiamusi-rice.jpg',
+  '保山小粒咖啡': '/images/crop-baoshan-coffee.jpg',
+  '修文猕猴桃': '/images/crop-xiuwen-kiwi.jpg',
+  '克山马铃薯': '/images/crop-keshan-potato.jpg',
+  '兰州百合': '/images/crop-lanzhou-lily.jpg',
+  '兴化龙香芋': '/images/crop-xinghua-taro.jpg',
+  '北京果品': '/images/crop-beijing-fruit.jpg',
+  '北镇葡萄': '/images/crop-beizhen-grape.jpg',
+  '南丰蜜桔': '/images/crop-nanfeng-mandarin.jpg',
+  '南果梨': '/images/crop-nanguo-pear.jpg',
+  '南汇水蜜桃': '/images/crop-nanhui-peach.jpg',
+  '双城大豆': '/images/crop-shuangcheng-soybean.jpg',
+  '吐鲁番葡萄': '/images/crop-turpan-grape.jpg',
+  '周至猕猴桃': '/images/crop-zhouzhi-kiwi.jpg',
+  '哈密瓜': '/images/crop-hami-melon.jpg',
+  '增城挂绿荔枝': '/images/crop-zengcheng-lychee.jpg',
+  '大同黄花': '/images/crop-datong-daylily.jpg',
+  '天津小站稻': '/images/crop-tianjin-rice.jpg',
+  '奉节脐橙': '/images/crop-fengjie-orange.jpg',
+  '安国中药材': '/images/crop-anguo-herb.jpg',
+  '安岳柠檬': '/images/crop-anyue-lemon.jpg',
+  '定西马铃薯': '/images/crop-dingxi-potato.jpg',
+  '宝应荷藕': '/images/crop-baoying-lotus.jpg',
+  '宣化牛奶葡萄': '/images/crop-xuanhua-grape.jpg',
+  '容县沙田柚': '/images/crop-rongxian-pomelo.jpg',
+  '富川脐橙': '/images/crop-fuchuan-orange.jpg',
+  '寿光蔬菜': '/images/crop-shouguang-vegetable.jpg',
+  '小站稻': '/images/crop-xiaozhan-rice.jpg',
+  '山葡萄酒': '/images/crop-wild-grape.jpg',
+  '峄城石榴': '/images/crop-yicheng-pomegranate.jpg',
+  '常山胡柚': '/images/crop-changshan-pomelo.jpg',
+  '平和琯溪蜜柚': '/images/crop-pinghe-pomelo.jpg',
+  '平泉香菇': '/images/crop-pingquan-shiitake.jpg',
+  '平谷大桃': '/images/crop-pinggu-peach.jpg',
+  '平遥长山药': '/images/crop-pingyao-yam.jpg',
+  '平邑金银花': '/images/crop-pingyi-honeysuckle.jpg',
+  '平顺潞党参': '/images/crop-pingshun-codonopsis.jpg',
+  '庄河蓝莓': '/images/crop-zhuanghe-blueberry.jpg',
+  '庆元香菇': '/images/crop-qingyuan-shiitake.jpg',
+  '库尔勒香梨': '/images/crop-korla-pear.jpg',
+  '廉江红橙': '/images/crop-lianjiang-orange.jpg',
+  '徐闻菠萝': '/images/crop-xuwen-pineapple.jpg',
+  '德庆贡柑': '/images/crop-deqing-mandarin.jpg',
+  '怀远石榴': '/images/crop-huaiyuan-pomegranate.jpg',
+  '惠州梅菜': '/images/crop-huizhou-meicai.jpg',
+  '慈溪杨梅': '/images/crop-cixi-bayberry.jpg',
+  '攀枝花芒果': '/images/crop-panzhihua-mango.jpg',
+  '斗南花卉': '/images/crop-dounan-flower.jpg',
+  '新会柑': '/images/crop-xinhui-mandarin.jpg',
+  '昭通天麻': '/images/crop-zhaotong-gastrodia.jpg',
+  '昭通苹果': '/images/crop-zhaotong-apple.jpg',
+  '朝阳小米': '/images/crop-chaoyang-millet.jpg',
+  '柴达木枸杞': '/images/crop-qaidam-goji.jpg',
+  '桓仁冰酒': '/images/crop-huanren-grape.jpg',
+  '梅州金柚': '/images/crop-meizhou-pomelo.jpg',
+  '榆树大米': '/images/crop-yushu-rice.jpg',
+  '武川马铃薯': '/images/crop-wuchuan-potato.jpg',
+  '武都花椒': '/images/crop-wudu-pepper.jpg',
+  '武鸣沃柑': '/images/crop-wuming-orange.jpg',
+  '永春芦柑': '/images/crop-yongchun-ponkan.jpg',
+  '沁州黄小米': '/images/crop-qinzhou-millet.jpg',
+  '沂源苹果': '/images/crop-yiyuan-apple.jpg',
+  '河套向日葵': '/images/crop-hetao-sunflower.jpg',
+  '泊头鸭梨': '/images/crop-botou-pear.jpg',
+  '洛川苹果': '/images/crop-luochuan-apple.jpg',
+  '洪山菜薹': '/images/crop-hongshan-caitai.jpg',
+  '洪湖莲藕': '/images/crop-honghu-lotus.jpg',
+  '海伦大豆': '/images/crop-hailun-soybean.jpg',
+  '涉县核桃': '/images/crop-shexian-walnut.jpg',
+  '涪陵榨菜原料': '/images/crop-fuling-zhacai.jpg',
+  '深州蜜桃': '/images/crop-shenzhou-peach.jpg',
+  '清徐葡萄': '/images/crop-qingxu-grape.jpg',
+  '灵武长枣': '/images/crop-lingwu-jujube.jpg',
+  '炎陵黄桃': '/images/crop-yanling-peach.jpg',
+  '烟台苹果': '/images/crop-yantai-apple.jpg',
+  '琼中绿橙': '/images/crop-qiongzhong-orange.jpg',
+  '甘谷辣椒': '/images/crop-gangu-chili.jpg',
+  '甜菜': '/images/crop-sugar-beet.jpg',
+  '白水苹果': '/images/crop-baishui-apple.jpg',
+  '百色芒果': '/images/crop-baise-mango.jpg',
+  '盘锦大米': '/images/crop-panjin-rice.jpg',
+  '眉县猕猴桃': '/images/crop-meixian-kiwi.jpg',
+  '砀山酥梨': '/images/crop-dangshan-pear.jpg',
+  '秭归脐橙': '/images/crop-zigui-orange.jpg',
+  '章丘大葱': '/images/crop-zhangqiu-scallion.jpg',
+  '米脂小米': '/images/crop-mizhi-millet.jpg',
+  '胶州大白菜': '/images/crop-jiaozhou-cabbage.jpg',
+  '花牛苹果': '/images/crop-huaniu-apple.jpg',
+  '苍山大蒜': '/images/crop-cangshan-garlic.jpg',
+  '苍溪红心猕猴桃': '/images/crop-cangxi-kiwi.jpg',
+  '荔浦芋': '/images/crop-lipu-taro.jpg',
+  '荣成无花果': '/images/crop-rongcheng-fig.jpg',
+  '莘县香瓜': '/images/crop-shenxian-melon.jpg',
+  '融安金桔': '/images/crop-rongan-kumquat.jpg',
+  '贺兰山东麓葡萄': '/images/crop-helanshan-grape.jpg',
+  '赣南脐橙': '/images/crop-gannan-orange.jpg',
+  '赤峰小米': '/images/crop-chifeng-millet.jpg',
+  '赵县雪花梨': '/images/crop-zhaoxian-pear.jpg',
+  '辽中寒富苹果': '/images/crop-liaozhong-apple.jpg',
+  '辽南苹果': '/images/crop-liaonan-apple.jpg',
+  '迁西板栗': '/images/crop-qianxi-chestnut.jpg',
+  '金乡大蒜': '/images/crop-jinxiang-garlic.jpg',
+  '长丰草莓': '/images/crop-changfeng-strawberry.jpg',
+  '长白山人参': '/images/crop-changbai-ginseng.jpg',
+  '阳山水蜜桃': '/images/crop-yangshan-peach.jpg',
+  '隆安火龙果': '/images/crop-longan-dragonfruit.jpg',
+  '隰县玉露香梨': '/images/crop-xixian-pear.jpg',
+  '青稞': '/images/crop-highland-barley.jpg',
+  '马陆葡萄': '/images/crop-malu-grape.jpg',
+  '高原冷凉蔬菜': '/images/crop-plateau-vegetable.jpg',
+  '高州荔枝': '/images/crop-gaozhou-lychee.jpg',
+  '黄骅冬枣': '/images/crop-huanghua-jujube.jpg',
+  '黑龙江寒地绿色农产品': '/images/crop-heilongjiang-green.jpg',
+  '宁国山核桃': '/images/crop-ningguo-walnut.jpg',
+  '呼伦贝尔油菜籽': '/images/crop-hulunbuir-rapeseed.jpg',
+  '玉米': '/images/crop-corn.jpg',
+  '小麦': '/images/crop-wheat.jpg',
+  '冬小麦': '/images/crop-wheat.jpg',
+  '花生': '/images/crop-peanut.jpg',
+  '水果': '/images/crop-fruit.jpg',
+  '稻谷': '/images/crop-rice.jpg',
+  '水稻': '/images/crop-rice.jpg',
+  '油菜籽': '/images/crop-rapeseed.jpg',
+  '茶叶': '/images/crop-tea.jpg',
+  '烤烟': '/images/crop-tobacco.jpg',
+  '棉花': '/images/crop-cotton.jpg',
+  '甘蔗': '/images/crop-sugarcane.jpg',
+  '大豆': '/images/crop-soybean.jpg',
+  '甘薯': '/images/crop-sweetpotato.jpg',
+  '绿豆': '/images/crop-mungbean.jpg',
+  '香蕉': '/images/crop-banana.jpg',
+  '富士苹果': '/images/crop-apple.jpg',
+  '葡萄': '/images/crop-grape.jpg',
+  '柑橘': '/images/crop-citrus.jpg',
+  '冬枣': '/images/crop-jujube.jpg',
+};
+
+/**
+ * 关键词规则（数组顺序即优先级，先命中先赢）。
+ * 仅对精确 map 未命中的「未知新作物」生效，作为兜底安全网。
+ */
+const CROP_IMAGE_RULES: Array<[RegExp, string]> = [
+  // 茶类特产共用茶园图（需求明确保留）
+  [/茶|毛尖|毛峰|碧螺春|龙井|普洱|铁观音|单丛|瓜片|翠芽|翠兰|岩茶|云雾|白茶|红茶|黑茶|绿茶|茉莉/, '/images/crop-tea.jpg'],
+  // 以下为未知新作物的粗分类兜底
+  [/苹果|花牛|寒富/, '/images/crop-apple.jpg'],
+  [/橙|柑|桔|柚|柠檬|橘/, '/images/crop-citrus.jpg'],
+  [/草莓|蓝莓|猕猴桃|杨梅|枇杷|菠萝|荔枝|芒果|火龙果|瓜|石榴|无花果|果/, '/images/crop-fruit.jpg'],
+  [/桃/, '/images/crop-peach.jpg'],
+  [/葡萄/, '/images/crop-grape.jpg'],
+  [/枣/, '/images/crop-jujube.jpg'],
+  [/梨/, '/images/crop-pear.jpg'],
+  [/米|稻/, '/images/crop-rice.jpg'],
+  [/小麦/, '/images/crop-wheat.jpg'],
+  [/大豆/, '/images/crop-soybean.jpg'],
+  [/马铃薯|土豆|蔬菜|大蒜|大葱|白菜|辣椒|芋|山药|榨菜|黄花|菜薹|甜菜|黄瓜|冬瓜|梅菜|花椒|豆角|芹菜|茄子|生姜|萝卜|菠菜|生菜|洋葱|青椒|韭菜|香菜|菜花|西兰花/, '/images/crop-vegetable.jpg'],
+  [/香菇|木耳|菌/, '/images/crop-vegetable.jpg'],
+  [/人参|枸杞|天麻|金银花|党参|白芍|百合|中药材|药材/, '/images/crop-herb.jpg']
+];
+
+/** 取作物对应的背景图 URL */
+export const cropImage = (cropType: string): string => {
+  const exact = CROP_IMAGE_MAP[cropType];
+  if (exact) return exact;
+  for (const [re, img] of CROP_IMAGE_RULES) {
+    if (re.test(cropType)) return img;
+  }
+  return FALLBACK_IMAGE;
+};

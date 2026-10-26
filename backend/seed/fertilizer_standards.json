@@ -1,0 +1,355 @@
+{
+  "version": "1.0",
+  "updated": "2026-10-16",
+  "source": "依据公开农业技术推广资料整理的通用参考值（按亩折算），属经验规则层，非当地测土配方检测结果；界面必须标注「通用建议，请结合当地农技指导与实际地力」",
+  "stageOptions": ["播种期", "育苗期", "苗期", "出苗期", "定植期", "分蘖期", "拔节期", "抽雄期", "孕穗期", "抽穗期", "开花期", "现蕾期", "下针期", "幼果期", "灌浆期", "鼓粒期", "结荚期", "块茎形成期", "块茎膨大期", "膨大期", "转色期", "成熟期", "采收期", "生长期", "休眠期"],
+  "weatherAdjustRules": {
+    "rain3d": { "label": "3 日强降雨", "action": "氮肥（尿素）建议雨后施用并减量 10%，避免淋失浪费" },
+    "heavyRain": { "label": "3 日暴雨", "action": "暂停追肥与喷施作业，改到雨后 2—3 天，防范农田积水沤根" },
+    "dry7d": { "label": "7 天无有效降水", "action": "追肥后需配合灌水，避免浓度过高烧苗" },
+    "heat": { "label": "高温", "action": "氮肥避开正午时段施用，尿素改为傍晚或清晨，减少挥发" },
+    "humid": { "label": "高湿", "action": "高湿条件下病害风险上升，建议提前喷施保护性杀菌剂并加强通风降湿" },
+    "strongWind": { "label": "大风", "action": "大风天停止叶面喷施，避免药液飘移与药害" }
+  },
+  "profiles": {
+    "cold_grain": {
+      "label": "冬小麦",
+      "stages": {
+        "播种期": {
+          "baseFertilizer": { "n": 6, "p": 4, "k": 3, "unit": "公斤/亩", "material": "底肥：磷酸二铵 20 公斤 + 尿素 13 公斤 + 硫酸钾 6 公斤（折纯量 6/4/3 公斤）" },
+          "tasks": ["播前深耕 20—25 厘米，底肥随土层翻入，防止种肥同穴烧种", "播后灌水沉实，确保出苗整齐"],
+          "weatherAdjust": ["dry7d", "rain3d"]
+        },
+        "分蘖期": {
+          "baseFertilizer": { "n": 4, "p": 2, "k": 2, "unit": "公斤/亩", "material": "尿素 9 公斤 + 磷酸二氢钾 3 公斤" },
+          "tasks": ["分蘖期是第一个吸肥高峰，看苗施肥：旺苗控氮、弱苗补氮", "结合天气适时灌水促分蘖"],
+          "weatherAdjust": ["rain3d", "dry7d"]
+        },
+        "拔节期": {
+          "baseFertilizer": { "n": 8, "p": 0, "k": 5, "unit": "公斤/亩", "material": "尿素 17 公斤 + 硫酸钾 8 公斤" },
+          "tasks": ["拔节期需水需肥高峰，追肥后及时灌水", "氮肥过量易倒伏，注意与长势长相配"],
+          "weatherAdjust": ["rain3d", "heat", "dry7d"]
+        },
+        "抽穗期": {
+          "baseFertilizer": { "n": 5, "p": 0, "k": 4, "unit": "公斤/亩", "material": "尿素 11 公斤 + 硫酸钾 6 公斤" },
+          "tasks": ["抽穗扬花期需水量最大，注意保持土壤湿润", "可叶面喷施磷酸二氢钾提高结实率"],
+          "weatherAdjust": ["rain3d", "heavyRain", "humid"]
+        },
+        "灌浆期": {
+          "baseFertilizer": { "n": 2, "p": 0, "k": 3, "unit": "公斤/亩", "material": "尿素 4 公斤 + 硫酸钾 5 公斤（可叶面喷施替代）" },
+          "tasks": ["灌浆期干物质积累关键期，忌大水漫灌以防倒伏", "缺肥黄叶可叶面喷施磷酸二氢钾 0.2% 溶液"],
+          "weatherAdjust": ["rain3d", "heat"]
+        },
+        "成熟期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 0, "unit": "公斤/亩", "material": "停止追肥，保持田间通风" },
+          "tasks": ["成熟前 7—10 天停水，便于机收减损", "关注干热风与倒伏风险"],
+          "weatherAdjust": ["heat", "strongWind"]
+        }
+      },
+      "pests": [
+        { "name": "条锈病", "trigger": "高湿 + 日均温 15—22℃", "condition": { "humidityGte": 80, "tempIn": [15, 22] }, "chemical": "三唑酮", "dose": 30, "doseUnit": "克/亩", "action": "发病初期叶面喷施，注意轮换用药抗性" },
+        { "name": "白粉病", "trigger": "高湿 + 温度 20—25℃ + 密度过大", "condition": { "humidityGte": 75, "tempIn": [20, 25] }, "chemical": "戊唑醇", "dose": 20, "doseUnit": "克/亩", "action": "发病中心区重点防治，兼防叶锈" },
+        { "name": "蚜虫", "trigger": "温度 15—25℃ 干旱", "condition": { "precip3dLt": 10, "tempIn": [15, 25] }, "chemical": "吡虫啉", "dose": 10, "doseUnit": "毫升/亩", "action": "百丛蚜量超 500 头时防治，兼治麦蚜" }
+      ]
+    },
+    "corn": {
+      "label": "玉米",
+      "stages": {
+        "播种期": {
+          "baseFertilizer": { "n": 6, "p": 3, "k": 2, "unit": "公斤/亩", "material": "复合肥（15-15-15）22 公斤 + 尿素 7 公斤" },
+          "tasks": ["种肥同播，种肥隔离 5 厘米以上防烧种", "深耕 25 厘米，蓄水保墒"],
+          "weatherAdjust": ["rain3d", "dry7d"]
+        },
+        "苗期": {
+          "baseFertilizer": { "n": 3, "p": 1, "k": 1, "unit": "公斤/亩", "material": "尿素 6 公斤" },
+          "tasks": ["苗期不追肥，蹲苗促根下扎", "缺苗及时补苗，超过三叶期改移苗补苗"],
+          "weatherAdjust": ["rain3d", "dry7d"]
+        },
+        "拔节期": {
+          "baseFertilizer": { "n": 10, "p": 2, "k": 4, "unit": "公斤/亩", "material": "尿素 22 公斤 + 硫酸钾 7 公斤" },
+          "tasks": ["拔节期重追肥，是决定穗粒数的关键期", "追肥后及时灌水，肥水配合"],
+          "weatherAdjust": ["rain3d", "heat", "dry7d"]
+        },
+        "抽雄期": {
+          "baseFertilizer": { "n": 5, "p": 0, "k": 3, "unit": "公斤/亩", "material": "尿素 11 公斤 + 硫酸钾 5 公斤" },
+          "tasks": ["抽雄吐丝期需水临界期，务必保证供水防止「卡脖旱」", "叶面喷施磷酸二氢钾 + 微肥提高授粉质量"],
+          "weatherAdjust": ["heat", "dry7d", "heavyRain"]
+        },
+        "灌浆期": {
+          "baseFertilizer": { "n": 2, "p": 0, "k": 2, "unit": "公斤/亩", "material": "尿素 4 公斤（可叶面喷施）" },
+          "tasks": ["灌浆期缺水显著减产，保持土壤墒情", "缺肥可叶面喷施磷酸二氢钾 0.2%"],
+          "weatherAdjust": ["heat", "dry7d"]
+        },
+        "成熟期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 0, "unit": "公斤/亩", "material": "停肥控水" },
+          "tasks": ["苞叶变黄、乳线移至基部时适期收获", "收获前 10—15 天停水，便于机收"],
+          "weatherAdjust": ["rain3d", "strongWind"]
+        }
+      },
+      "pests": [
+        { "name": "玉米螟", "trigger": "温度 22—30℃ 高温多湿", "condition": { "tempIn": [22, 30], "humidityGte": 65 }, "chemical": "氯虫苯甲酰胺", "dose": 4, "doseUnit": "毫升/亩", "action": "心叶末期撒施颗粒剂，或释放赤眼蜂防治" },
+        { "name": "大小斑病", "trigger": "高湿高温 + 密度过大", "condition": { "humidityGte": 80, "tempIn": [22, 30] }, "chemical": "苯醚甲环唑", "dose": 30, "doseUnit": "毫升/亩", "action": "发病初期叶面喷施，重病区需灌根" },
+        { "name": "草地贪夜蛾", "trigger": "温度 26—30℃ 夜间活动", "condition": { "tempIn": [26, 30] }, "chemical": "甲维盐", "dose": 12, "doseUnit": "毫升/亩", "action": "低龄幼虫期清晨或傍晚施药，兼防甜菜夜蛾" }
+      ]
+    },
+    "rice": {
+      "label": "水稻",
+      "stages": {
+        "移栽期": {
+          "baseFertilizer": { "n": 6, "p": 3, "k": 4, "unit": "公斤/亩", "material": "尿素 13 公斤 + 磷酸二铵 8 公斤 + 硫酸钾 7 公斤" },
+          "tasks": ["移栽前施足底肥，浅水护秧", "机插秧注意缓苗期管理"],
+          "weatherAdjust": ["rain3d", "heavyRain"]
+        },
+        "分蘖期": {
+          "baseFertilizer": { "n": 5, "p": 1, "k": 3, "unit": "公斤/亩", "material": "尿素 11 公斤 + 硫酸钾 5 公斤" },
+          "tasks": ["浅水勤灌促分蘖，够苗后晒田控蘖", "注意稻瘟病与二化螟"],
+          "weatherAdjust": ["humid", "heavyRain"]
+        },
+        "拔节期": {
+          "baseFertilizer": { "n": 4, "p": 1, "k": 4, "unit": "公斤/亩", "material": "尿素 9 公斤 + 硫酸钾 7 公斤" },
+          "tasks": ["够苗晒田后复水，孕穗期保持浅水层", "穗肥不可过量以防贪青倒伏"],
+          "weatherAdjust": ["heavyRain", "heat"]
+        },
+        "抽穗期": {
+          "baseFertilizer": { "n": 2, "p": 0, "k": 3, "unit": "公斤/亩", "material": "尿素 4 公斤 + 硫酸钾 5 公斤" },
+          "tasks": ["抽穗扬花期保持 3—5 厘米水层，促进授粉", "破口期预防穗颈瘟是保产关键"],
+          "weatherAdjust": ["humid", "heat", "dry7d"]
+        },
+        "灌浆期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 2, "unit": "公斤/亩", "material": "硫酸钾 3 公斤（可叶面喷施）" },
+          "tasks": ["灌浆期干湿交替，以湿为主，养根保叶", "严禁早断水，防早衰"],
+          "weatherAdjust": ["heat", "dry7d"]
+        },
+        "成熟期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 0, "unit": "公斤/亩", "material": "停肥控水" },
+          "tasks": ["蜡熟末期收获，收后及时晾晒防霉变"],
+          "weatherAdjust": ["heavyRain"]
+        }
+      },
+      "pests": [
+        { "name": "稻瘟病", "trigger": "高湿 + 温度 20—28℃", "condition": { "humidityGte": 80, "tempIn": [20, 28] }, "chemical": "三环唑", "dose": 40, "doseUnit": "克/亩", "action": "破口期与齐穗期各喷一次，是水稻最关键病害" },
+        { "name": "二化螟", "trigger": "高温高湿 + 蛾峰期", "condition": { "humidityGte": 70, "tempIn": [22, 30] }, "chemical": "氯虫苯甲酰胺", "dose": 3, "doseUnit": "毫升/亩", "action": "一代、二代蛾峰期后 7 天内施药" },
+        { "name": "纹枯病", "trigger": "高湿高温 + 群体郁闭", "condition": { "humidityGte": 85, "tempIn": [28, 35] }, "chemical": "井冈·蜡菌胺", "dose": 30, "doseUnit": "毫升/亩", "action": "发病初期对准稻株中下部施药，配合排水降湿" }
+      ]
+    },
+    "oil": {
+      "label": "花生",
+      "stages": {
+        "播种期": {
+          "baseFertilizer": { "n": 4, "p": 4, "k": 3, "unit": "公斤/亩", "material": "复合肥（15-15-15）18 公斤 + 有机肥 500 公斤" },
+          "tasks": ["花生需肥集中，底肥以有机肥为主、化肥为辅", "起垄种植有利排水防涝"],
+          "weatherAdjust": ["rain3d", "dry7d"]
+        },
+        "出苗期": {
+          "baseFertilizer": { "n": 2, "p": 0, "k": 1, "unit": "公斤/亩", "material": "尿素 4 公斤" },
+          "tasks": ["苗期看苗追肥，缺氮可叶面喷施 1% 尿素液", "及时中耕除草，防草荒"],
+          "weatherAdjust": ["dry7d", "rain3d"]
+        },
+        "开花期": {
+          "baseFertilizer": { "n": 3, "p": 1, "k": 3, "unit": "公斤/亩", "material": "尿素 7 公斤 + 硫酸钾 5 公斤" },
+          "tasks": ["开花下针期是施肥关键期，保证钙硼供应提高饱满度", "叶面喷施钙肥防空针"],
+          "weatherAdjust": ["rain3d", "heat"]
+        },
+        "荚果期": {
+          "baseFertilizer": { "n": 2, "p": 1, "k": 4, "unit": "公斤/亩", "material": "硫酸钾 7 公斤 + 尿素 4 公斤" },
+          "tasks": ["荚果膨大期增施钾肥显著提高产量与品质", "注意排水防涝，涝渍易烂果"],
+          "weatherAdjust": ["heavyRain", "humid"]
+        },
+        "成熟期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 0, "unit": "公斤/亩", "material": "停肥" },
+          "tasks": ["成熟期保持田间不过湿，适时抢收晒干"],
+          "weatherAdjust": ["heavyRain"]
+        }
+      },
+      "pests": [
+        { "name": "叶斑病", "trigger": "高湿高温", "condition": { "humidityGte": 80, "tempIn": [22, 30] }, "chemical": "代森锰锌", "dose": 30, "doseUnit": "克/亩", "action": "发病初期摘除病叶并喷施保护性杀菌剂" },
+        { "name": "蛴螬（金针虫）", "trigger": "土温 15—20℃ 沙壤土", "condition": { "tempIn": [15, 20] }, "chemical": "辛硫磷 / 毒死蜱", "dose": 1.5, "doseUnit": "公斤/亩", "action": "整地前拌土施用，防治地下害虫危害荚果" }
+      ]
+    },
+    "soy": {
+      "label": "大豆",
+      "stages": {
+        "播种期": {
+          "baseFertilizer": { "n": 3, "p": 4, "k": 3, "unit": "公斤/亩", "material": "磷酸二铵 18 公斤 + 硫酸钾 5 公斤（少施氮肥防贪青）" },
+          "tasks": ["大豆根瘤固氮，氮肥宜少不宜多", "接种根瘤菌剂可显著提高固氮效率"],
+          "weatherAdjust": ["rain3d", "dry7d"]
+        },
+        "苗期": {
+          "baseFertilizer": { "n": 1, "p": 1, "k": 1, "unit": "公斤/亩", "material": "叶面喷施磷酸二氢钾 0.2%" },
+          "tasks": ["苗期看苗追肥，缺素可叶面补充", "及时除草，化学除草注意安全间隔期"],
+          "weatherAdjust": ["dry7d", "rain3d"]
+        },
+        "开花期": {
+          "baseFertilizer": { "n": 2, "p": 1, "k": 2, "unit": "公斤/亩", "material": "尿素 4 公斤 + 硫酸钾 3 公斤" },
+          "tasks": ["开花期需水量最大，遇旱及时灌水保荚", "叶面喷施钼硼有利于结荚"],
+          "weatherAdjust": ["dry7d", "heat", "rain3d"]
+        },
+        "结荚期": {
+          "baseFertilizer": { "n": 2, "p": 1, "k": 3, "unit": "公斤/亩", "material": "硫酸钾 5 公斤" },
+          "tasks": ["结荚鼓粒期增施钾肥提高百粒重", "根腐病高发田块注意排水"],
+          "weatherAdjust": ["heavyRain", "humid"]
+        },
+        "成熟期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 0, "unit": "公斤/亩", "material": "停肥" },
+          "tasks": ["黄叶落荚时抢收，脱粒后及时晾晒"],
+          "weatherAdjust": ["heavyRain"]
+        }
+      },
+      "pests": [
+        { "name": "大豆食心虫", "trigger": "8 月下旬成虫盛发", "condition": { "tempIn": [20, 30] }, "chemical": "氯虫苯甲酰胺", "dose": 2, "doseUnit": "毫升/亩", "action": "盛发期防治，兼治豆荚螟" },
+        { "name": "豆角斑病", "trigger": "高湿高温 + 密度大", "condition": { "humidityGte": 80, "tempIn": [25, 32] }, "chemical": "苯醚甲环唑", "dose": 20, "doseUnit": "毫升/亩", "action": "发病初期叶面喷施，及时轮换用药" }
+      ]
+    },
+    "tuber": {
+      "label": "马铃薯 / 甘薯",
+      "stages": {
+        "播种期": {
+          "baseFertilizer": { "n": 5, "p": 5, "k": 4, "unit": "公斤/亩", "material": "复合肥（15-15-15）30 公斤 + 有机肥 1000 公斤" },
+          "tasks": ["马铃薯喜钾，钾肥比重应高于氮肥", "切块催芽后适期播种，覆土 10 厘米左右"],
+          "weatherAdjust": ["rain3d", "dry7d"]
+        },
+        "出苗期": {
+          "baseFertilizer": { "n": 2, "p": 1, "k": 1, "unit": "公斤/亩", "material": "尿素 4 公斤" },
+          "tasks": ["出苗后中耕除草培土，注意缺苗补种", "苗期不宜多施氮肥以防空长"],
+          "weatherAdjust": ["dry7d", "rain3d"]
+        },
+        "现蕾期": {
+          "baseFertilizer": { "n": 5, "p": 2, "k": 5, "unit": "公斤/亩", "material": "尿素 11 公斤 + 硫酸钾 8 公斤" },
+          "tasks": ["现蕾期是需肥高峰，结合灌水效果好", "预防晚疫病，潮湿天气是高发期"],
+          "weatherAdjust": ["humid", "rain3d", "heat"]
+        },
+        "块茎膨大期": {
+          "baseFertilizer": { "n": 2, "p": 1, "k": 6, "unit": "公斤/亩", "material": "硫酸钾 10 公斤" },
+          "tasks": ["膨大期增施钾肥显著增产，切忌大水漫漫灌以防烂薯", "遇涝及时排水"],
+          "weatherAdjust": ["heavyRain", "humid"]
+        },
+        "成熟期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 0, "unit": "公斤/亩", "material": "停肥控水" },
+          "tasks": ["薯皮老化、茎叶枯萎时收获，避开雨季", "及时避光贮藏防发芽变绿"],
+          "weatherAdjust": ["heavyRain"]
+        }
+      },
+      "pests": [
+        { "name": "晚疫病", "trigger": "高湿 + 温度 15—22℃", "condition": { "humidityGte": 80, "tempIn": [15, 22] }, "chemical": "霜霉威 / 烯酰吗啉", "dose": 40, "doseUnit": "毫升/亩", "action": "发病初期喷施，连续阴雨需缩短间隔期" },
+        { "name": "马铃薯甲虫", "trigger": "温度 20—25℃", "condition": { "tempIn": [20, 25] }, "chemical": "啶虫脒", "dose": 3, "doseUnit": "毫升/亩", "action": "幼虫期防治，可兼治小菜蛾" }
+      ]
+    },
+    "veg": {
+      "label": "蔬菜",
+      "stages": {
+        "育苗期": {
+          "baseFertilizer": { "n": 3, "p": 2, "k": 1, "unit": "公斤/亩", "material": "苗床基质混配腐熟有机肥，不施生肥" },
+          "tasks": ["苗床注意通风降湿，预防猝倒病", "苗期不追浓肥"],
+          "weatherAdjust": ["humid", "rain3d"]
+        },
+        "定植期": {
+          "baseFertilizer": { "n": 5, "p": 4, "k": 3, "unit": "公斤/亩", "material": "腐熟有机肥 2000 公斤 + 复合肥 25 公斤" },
+          "tasks": ["定植前施足底肥，缓苗水浇透", "棚室通风降湿是防病害关键"],
+          "weatherAdjust": ["rain3d", "heavyRain"]
+        },
+        "生长期": {
+          "baseFertilizer": { "n": 4, "p": 2, "k": 3, "unit": "公斤/亩", "material": "尿素 8 公斤 + 硫酸钾 5 公斤（分 2—3 次）" },
+          "tasks": ["生长期薄肥勤施，叶菜类以氮为主、果菜类氮钾平衡", "注意轮作与土壤板结改良"],
+          "weatherAdjust": ["rain3d", "heat", "dry7d"]
+        },
+        "采收期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 2, "unit": "公斤/亩", "material": "硫酸钾 3 公斤（促着色提质）" },
+          "tasks": ["采收前 7 天停止使用高氮肥料，避免硝酸盐超标", "及时采收，间隔期保持水肥供应"],
+          "weatherAdjust": ["heavyRain", "heat"]
+        }
+      },
+      "pests": [
+        { "name": "霜霉病", "trigger": "高湿 + 温度 15—22℃", "condition": { "humidityGte": 80, "tempIn": [15, 22] }, "chemical": "霜霉威", "dose": 30, "doseUnit": "毫升/亩", "action": "棚室加强放风降湿，发病初期喷施" },
+        { "name": "白粉虱", "trigger": "干旱高温", "condition": { "tempIn": [22, 30], "precip3dLt": 10 }, "chemical": "啶虫脒", "dose": 2, "doseUnit": "毫升/亩", "action": "黄板诱杀 + 药剂防治，兼治蓟马" },
+        { "name": "软腐病", "trigger": "高温高湿 + 田间积水", "condition": { "humidityGte": 85, "tempIn": [25, 32] }, "chemical": "氢氧化铜", "dose": 25, "doseUnit": "克/亩", "action": "及时拔除病株带出田外，避免连作" }
+      ]
+    },
+    "fruit": {
+      "label": "果树",
+      "stages": {
+        "花期": {
+          "baseFertilizer": { "n": 2, "p": 1, "k": 2, "unit": "公斤/亩", "material": "叶面喷施磷酸二氢钾 0.2% + 硼肥" },
+          "tasks": ["花期保肥保水，补充硼肥显著提高坐果率", "遇干热风与连阴雨需辅助授粉"],
+          "weatherAdjust": ["dry7d", "heat", "humid"]
+        },
+        "幼果期": {
+          "baseFertilizer": { "n": 3, "p": 2, "k": 3, "unit": "公斤/亩", "material": "高钾型复合肥 15 公斤，分 2 次施" },
+          "tasks": ["幼果期疏果定果，负载量按树势调整", "注意绿盲蝽与红蜘蛛为害"],
+          "weatherAdjust": ["rain3d", "dry7d"]
+        },
+        "膨大期": {
+          "baseFertilizer": { "n": 2, "p": 1, "k": 4, "unit": "公斤/亩", "material": "硫酸钾 7 公斤" },
+          "tasks": ["膨大期需钾量最大，是提质关键", "控制水分以防裂果"],
+          "weatherAdjust": ["dry7d", "heat", "heavyRain"]
+        },
+        "转色期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 3, "unit": "公斤/亩", "material": "硫酸钾 5 公斤 + 叶面喷施钙肥" },
+          "tasks": ["转色期控氮增钾，提升糖度与着色", "套袋果园注意通风降湿"],
+          "weatherAdjust": ["humid", "rain3d"]
+        },
+        "采收期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 0, "unit": "公斤/亩", "material": "采后立即施基肥" },
+          "tasks": ["采后 7—10 天完成基肥（腐熟有机肥 + 复合肥）", "结合修剪清园做好冬季管理"],
+          "weatherAdjust": ["dry7d"]
+        }
+      },
+      "pests": [
+        { "name": "绿盲蝽", "trigger": "温度 20—28℃ 新梢生长期", "condition": { "tempIn": [20, 28] }, "chemical": "吡虫啉", "dose": 10, "doseUnit": "毫升/亩", "action": "新梢生长期重点防治，兼治蚜虫" },
+        { "name": "红蜘蛛", "trigger": "高温干旱", "condition": { "tempIn": [26, 35], "precip3dLt": 10 }, "chemical": "哒螨灵", "dose": 20, "doseUnit": "毫升/亩", "action": "干旱高温易爆发，用药后保证叶背着药" },
+        { "name": "炭疽病", "trigger": "高湿高温", "condition": { "humidityGte": 80, "tempIn": [24, 32] }, "chemical": "咪鲜胺", "dose": 30, "doseUnit": "毫升/亩", "action": "发病初期喷施，剪除病枝病果带出果园" }
+      ]
+    },
+    "cotton": {
+      "label": "棉花",
+      "stages": {
+        "播种期": {
+          "baseFertilizer": { "n": 5, "p": 4, "k": 3, "unit": "公斤/亩", "material": "复合肥（15-15-15）22 公斤 + 尿素 6 公斤" },
+          "tasks": ["施足底肥，铺膜保墒", "适期播种，播后覆盖保苗"],
+          "weatherAdjust": ["rain3d", "dry7d"]
+        },
+        "苗期": {
+          "baseFertilizer": { "n": 2, "p": 1, "k": 1, "unit": "公斤/亩", "material": "叶面喷施磷酸二氢钾" },
+          "tasks": ["苗期注意防僵苗与缺苗", "及时中耕除草"],
+          "weatherAdjust": ["dry7d", "rain3d"]
+        },
+        "开花期": {
+          "baseFertilizer": { "n": 4, "p": 1, "k": 4, "unit": "公斤/亩", "material": "尿素 9 公斤 + 硫酸钾 7 公斤" },
+          "tasks": ["花期需水需肥高峰，结合灌溉效果最好", "及时打顶控制营养生长"],
+          "weatherAdjust": ["heat", "dry7d", "rain3d"]
+        },
+        "结铃期": {
+          "baseFertilizer": { "n": 3, "p": 1, "k": 5, "unit": "公斤/亩", "material": "硫酸钾 8 公斤" },
+          "tasks": ["铃期重施钾肥，是夺取高产的关键", "重点防治棉铃虫与红蜘蛛"],
+          "weatherAdjust": ["heat", "humid", "dry7d"]
+        },
+        "成熟期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 0, "unit": "公斤/亩", "material": "停肥" },
+          "tasks": ["吐絮期及时采收，霜前抢收避免晚花损失"],
+          "weatherAdjust": ["rain3d"]
+        }
+      },
+      "pests": [
+        { "name": "棉铃虫", "trigger": "高温 + 蛾峰期", "condition": { "tempIn": [25, 32] }, "chemical": "氯虫苯甲酰胺", "dose": 3, "doseUnit": "毫升/亩", "action": "卵孵盛期施药，兼治棉蚜、棉蓟马" },
+        { "name": "枯萎病", "trigger": "高温干旱 + 土壤板结", "condition": { "tempIn": [28, 35], "precip3dLt": 10 }, "chemical": "枯萎灵 / 甲基托布津灌根", "dose": 100, "doseUnit": "毫升/亩", "action": "发病初期灌根，配合轮作与深翻改土" }
+      ]
+    },
+    "default": {
+      "label": "通用作物",
+      "stages": {
+        "生长期": {
+          "baseFertilizer": { "n": 5, "p": 3, "k": 3, "unit": "公斤/亩", "material": "通用复合肥 18 公斤（按当地土壤肥力调整）" },
+          "tasks": ["按「测土配方、平衡施肥」原则，缺什么补什么", "结合当地农技部门指导确定具体用量"],
+          "weatherAdjust": ["rain3d", "dry7d", "heat"]
+        },
+        "采收期": {
+          "baseFertilizer": { "n": 0, "p": 0, "k": 2, "unit": "公斤/亩", "material": "硫酸钾 3 公斤（促品质）" },
+          "tasks": ["采收前控制氮肥用量", "及时采收，避雨作业减少病害"],
+          "weatherAdjust": ["heavyRain"]
+        }
+      },
+      "pests": [
+        { "name": "蚜虫（通用）", "trigger": "温暖干燥", "condition": { "tempIn": [18, 28], "precip3dLt": 10 }, "chemical": "吡虫啉", "dose": 10, "doseUnit": "毫升/亩", "action": "监测虫口密度，达到防治指标再用药" }
+      ]
+    }
+  }
+}
