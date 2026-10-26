@@ -245,7 +245,7 @@ python scripts/train_price_model.py --horizon 14    # 改预测步长
 | `AI_TIMEOUT_MS` `AI_MAX_TOKENS`                       | `60000` / `2000` | 单次调用预算，切换模型时按内置标定值自动覆盖                                         |
 | `ADMIN_DEFAULT_PASSWORD` `DEMO_DEFAULT_PASSWORD`      | 空                | 覆盖默认演示口令                                                       |
 
-**关于模型切换**：页面内下拉框可选 9 个已标定模型（`Atria-Dawn` / `glm-5.3` / `qwen3.8-27b` / `deepseek-v4-flash` / `deepseek-v4-pro` / `minimax-m3` / `kimi-k2.6` / `intern-s2` / `Agents-A1`），每个模型的 `maxTokens` 与 `timeout` 按实测思维链长度单独标定在 `llmService.js` 的 `INTERN_MODELS` 中，切换即生效。后端对 `model` 字段做白名单校验，不在清单内返回 400。推理型模型（`intern-s2`、`kimi`）思维链实测占 1500–3400 tokens，预算给少了会出现「等很久但正文为空」，这是标定的由来。
+**关于模型切换**：页面内下拉框可选 9 个已标定模型（`Atria-Dawn` / `glm-5.3` / `qwen3.8-27b` / `deepseek-v4-flash` / `deepseek-v4-pro` / `minimax-m3` / `kimi-k2.6` / `intern-s2` / `Agents-A1`），每个模型的 `maxTokens` 与 `timeout` 按实测思维链长度单独标定在 `llmService.js` 的 `INTERN_MODELS` 中，切换即生效。后端对 `model` 字段做白名单校验，不在清单内返回 400。推理型模型（`intern-s2`、`kimi`）思维链实测占 1500–3400 tokens。
 
 ---
 
